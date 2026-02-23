@@ -1,0 +1,96 @@
+.diagnosis-container {
+  padding-top: var(--space-16);
+  padding-bottom: var(--space-16);
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.diagnosis-header {
+  text-align: center;
+  margin-bottom: var(--space-12);
+}
+
+.status-icon {
+  width: 64px;
+  height: 64px;
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-4);
+}
+
+.diagnosis-header h1 {
+  margin-bottom: var(--space-2);
+}
+
+.diagnosis-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+  margin-bottom: var(--space-12);
+}
+
+.diagnosis-card {
+  padding: var(--space-6);
+  border-top: 4px solid var(--color-border-primary);
+}
+
+.diagnosis-card:nth-child(1) {
+  border-top-color: #3b82f6;
+}
+.diagnosis-card:nth-child(2) {
+  border-top-color: #8b5cf6;
+}
+.diagnosis-card:nth-child(3) {
+  border-top-color: #ec4899;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.card-icon {
+  color: var(--color-text-secondary);
+}
+
+.card-header h3 {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+}
+
+.diagnosis-value {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.diagnosis-actions {
+  text-align: center;
+}
+
+.diagnosis-actions p {
+  margin-bottom: var(--space-6);
+  font-size: 1rem;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+@media (max-width: 768px) {
+  .diagnosis-grid {
+    grid-template-columns: 1fr;
+  }
+}
