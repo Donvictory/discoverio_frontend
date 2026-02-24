@@ -36,7 +36,7 @@ interface ChatSession {
 }
 
 export function ChatLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [chatPhase, setChatPhase] = useState<
     "idle" | "searching" | "diagnosis" | "results"
