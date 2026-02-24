@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ChatSidebar } from "./ChatSidebar";
 import { ChatView } from "./ChatView";
-import { Share2 } from "lucide-react";
+import { Share2, PanelLeft } from "lucide-react";
 import "./ChatLayout.css";
 
 interface ChatMessage {
@@ -205,6 +205,17 @@ export function ChatLayout() {
         <Share2 size={16} />
         <span>Share</span>
       </button>
+
+      {/* Floating expand button — visible on mobile when sidebar is collapsed */}
+      {!sidebarOpen && (
+        <button
+          className="chat-sidebar-expand-btn"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="Expand sidebar"
+        >
+          <PanelLeft size={18} />
+        </button>
+      )}
 
       <ChatSidebar
         isOpen={sidebarOpen}
