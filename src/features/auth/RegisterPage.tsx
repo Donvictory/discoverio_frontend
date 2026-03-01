@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { Sparkles } from "lucide-react";
 import "./AuthPages.css";
 
 export function RegisterPage() {
@@ -21,7 +22,6 @@ export function RegisterPage() {
     }
 
     setLoading(true);
-    // Simulate brief loading then navigate to onboarding
     setTimeout(() => {
       setLoading(false);
       navigate("/onboarding", { replace: true });
@@ -30,17 +30,17 @@ export function RegisterPage() {
 
   return (
     <div className="auth-page">
-      <div className="auth-bg" aria-hidden="true" />
+      {/* Logo */}
+      <Link to="/" className="auth-logo">
+        <Sparkles size={24} className="auth-logo__icon" />
+        <span className="auth-logo__text">Discover.io</span>
+      </Link>
 
+      {/* Card */}
       <div className="auth-card">
-        <Link to="/" className="auth-logo">
-          <span className="auth-logo__icon">✦</span>
-          <span className="auth-logo__text">Discover.io</span>
-        </Link>
-
         <h1 className="auth-heading">Create your account</h1>
         <p className="auth-subheading">
-          Start discovering the right tools for you
+          Start discovering AI tools tailored to you.
         </p>
 
         {error && (
@@ -51,13 +51,13 @@ export function RegisterPage() {
 
         <form className="auth-form" onSubmit={handleSubmit} noValidate>
           <div className="auth-field">
-            <label htmlFor="register-name">Full name</label>
+            <label htmlFor="register-name">Full Name</label>
             <input
               id="register-name"
               type="text"
               autoComplete="name"
               required
-              placeholder="Jane Doe"
+              placeholder="Your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -84,7 +84,7 @@ export function RegisterPage() {
               autoComplete="new-password"
               required
               minLength={8}
-              placeholder="At least 8 characters"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -99,7 +99,7 @@ export function RegisterPage() {
             {loading ? (
               <span className="auth-btn__spinner" />
             ) : (
-              "Create account"
+              "Create Account"
             )}
           </button>
         </form>
@@ -110,10 +110,6 @@ export function RegisterPage() {
             Sign in
           </Link>
         </p>
-
-        <Link to="/" className="auth-back-link">
-          ← Back to home
-        </Link>
       </div>
     </div>
   );

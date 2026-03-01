@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
   Star,
@@ -10,6 +10,10 @@ import {
   Menu,
   X,
   SlidersHorizontal,
+  Bookmark,
+  Sparkles,
+  LayoutGrid,
+  Home,
 } from "lucide-react";
 import "./ToolsCatalogue.css";
 
@@ -184,10 +188,44 @@ const CATEGORIES = [
   "Productivity",
 ];
 
+const STORAGE_KEY = "discoverio_saved_tools";
+
+function getSavedIds(): string[] {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+}
+
+function setSavedIds(ids: string[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
+}
+
 export function ToolsCatalogue() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
+  const [activeView, setActiveView] = useState<"all" | "saved">("all");
+  const [savedToolIds, setSavedToolIds] = useState<string[]>(getSavedIds);
+
+  // Persist saved tools to localStorage
+  useEffect(() => {
+    setSavedIds(savedToolIds);
+  }, [savedToolIds]);
+
+  const toggleSaved = (e: React.MouseEvent, toolId: string) => {
+    e.preventDefault(); // prevent card link navigation
+    e.stopPropagation();
+    setSavedToolIds((prev) =>
+      prev.includes(toolId)
+        ? prev.filter((id) => id !== toolId)
+        : [...prev, toolId]
+    );
+  };
+
+  const isSaved = (toolId: string) => savedToolIds.includes(toolId);
 
   const filteredTools = TOOLS.filter((tool) => {
     const matchesSearch =
@@ -195,8 +233,12 @@ export function ToolsCatalogue() {
       tool.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory =
       activeCategory === "All" || tool.category === activeCategory;
-    return matchesSearch && matchesCategory;
+    const matchesView =
+      activeView === "all" || savedToolIds.includes(tool.id);
+    return matchesSearch && matchesCategory && matchesView;
   });
+
+  const savedCount = savedToolIds.length;
 
   return (
     <div className="catalogue">
@@ -204,43 +246,19 @@ export function ToolsCatalogue() {
       <header className="catalogue-nav">
         <div className="catalogue-nav__inner">
           <Link to="/" className="catalogue-nav__logo">
-            <span className="catalogue-logo-icon">
-              <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
-                <rect width="11" height="11" rx="3" fill="#1a1d2e" />
-                <rect x="15" width="11" height="11" rx="3" fill="#1a1d2e" />
-                <rect y="15" width="11" height="11" rx="3" fill="#1a1d2e" />
-                <circle cx="20.5" cy="20.5" r="4" fill="#2ec4b6" />
-              </svg>
-            </span>
+            <Sparkles size={20} className="catalogue-logo-icon-svg" />
             <span className="catalogue-logo-text">Discover.io</span>
           </Link>
 
-          <nav
-            className={`catalogue-nav__links ${menuOpen ? "open" : ""}`}
-          >
-            <Link to="/" onClick={() => setMenuOpen(false)}>
-              Home
-            </Link>
-            <a href="/#features" onClick={() => setMenuOpen(false)}>
-              Features
-            </a>
-            <Link
-              to="/catalogue"
-              className="active"
-              onClick={() => setMenuOpen(false)}
-            >
-              Tools
-            </Link>
-            <a href="/#how-it-works" onClick={() => setMenuOpen(false)}>
-              How It Works
-            </a>
-            <a href="/#about" onClick={() => setMenuOpen(false)}>
-              About
-            </a>
+          {/* Desktop nav */}
+          <nav className="catalogue-nav__links">
+            <Link to="/">Home</Link>
+            <Link to="/chat">Discover</Link>
+            <Link to="/catalogue" className="active">Catalog</Link>
           </nav>
 
           <div className="catalogue-nav__actions">
-            {/* User is authenticated, so no login/signup buttons here */}
+            {/* empty for authenticated user */}
           </div>
 
           <button
@@ -253,8 +271,102 @@ export function ToolsCatalogue() {
         </div>
       </header>
 
+      {/* ─── Mobile Menu Overlay ────────────────────────────── */}
+      <AnimatePresence>
+        {menuOpen && (
+          <>
+            <motion.div
+              className="catalogue-mobile-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setMenuOpen(false)}
+            />
+            <motion.div
+              className="catalogue-mobile-menu"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            >
+              <div className="catalogue-mobile-menu__header">
+                <span className="catalogue-mobile-menu__title">Menu</span>
+                <button
+                  className="catalogue-mobile-menu__close"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <nav className="catalogue-mobile-menu__nav">
+                <Link
+                  to="/"
+                  className="catalogue-mobile-menu__link"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <Home size={18} />
+                  <span>Home</span>
+                </Link>
+                <Link
+                  to="/chat"
+                  className="catalogue-mobile-menu__link"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <Search size={18} />
+                  <span>Discover</span>
+                </Link>
+                <Link
+                  to="/catalogue"
+                  className="catalogue-mobile-menu__link active"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <LayoutGrid size={18} />
+                  <span>Catalog</span>
+                </Link>
+                <a
+                  href="#"
+                  className="catalogue-mobile-menu__link"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <Bookmark size={18} />
+                  <span>Saved</span>
+                </a>
+              </nav>
+
+              <div className="catalogue-mobile-menu__footer">
+                <p className="catalogue-mobile-menu__hint">
+                  Browse and discover the best AI tools
+                </p>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       {/* ─── Main Content ──────────────────────────────────── */}
       <main className="catalogue-main">
+        {/* View Tabs: All Tools / Saved */}
+        <div className="catalogue-view-tabs">
+          <button
+            className={`catalogue-view-tab ${activeView === "all" ? "active" : ""}`}
+            onClick={() => setActiveView("all")}
+          >
+            All Tools
+          </button>
+          <button
+            className={`catalogue-view-tab ${activeView === "saved" ? "active" : ""}`}
+            onClick={() => setActiveView("saved")}
+          >
+            <Bookmark size={15} />
+            Saved
+            {savedCount > 0 && (
+              <span className="catalogue-view-tab__badge">{savedCount}</span>
+            )}
+          </button>
+        </div>
+
         {/* Search Bar */}
         <div className="catalogue-search-wrapper">
           <div className="catalogue-search">
@@ -294,7 +406,7 @@ export function ToolsCatalogue() {
 
         {/* Section Title */}
         <div className="catalogue-section-title">
-          <h2>Tools</h2>
+          <h2>{activeView === "saved" ? "Saved Tools" : "Tools"}</h2>
           <span className="catalogue-count">
             {filteredTools.length} tool{filteredTools.length !== 1 ? "s" : ""}{" "}
             found
@@ -303,64 +415,104 @@ export function ToolsCatalogue() {
 
         {/* Tools Grid */}
         <div className="catalogue-grid">
-          {filteredTools.map((tool, i) => (
-            <motion.a
-              key={tool.id}
-              href={tool.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="tool-catalogue-card"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, delay: i * 0.05 }}
-            >
-              {/* Colored Icon Area */}
-              <div
-                className="tool-catalogue-card__icon-area"
-                style={{ backgroundColor: tool.bgColor }}
+          <AnimatePresence mode="popLayout">
+            {filteredTools.map((tool, i) => (
+              <motion.div
+                key={tool.id}
+                className="tool-catalogue-card"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.35, delay: i * 0.04 }}
+                layout
               >
-                <span className="tool-catalogue-card__emoji">{tool.emoji}</span>
-              </div>
+                {/* Bookmark Button */}
+                <button
+                  className={`tool-catalogue-card__bookmark ${isSaved(tool.id) ? "saved" : ""}`}
+                  onClick={(e) => toggleSaved(e, tool.id)}
+                  title={isSaved(tool.id) ? "Remove from saved" : "Save tool"}
+                  aria-label={isSaved(tool.id) ? "Remove from saved" : "Save tool"}
+                >
+                  <Bookmark size={16} />
+                </button>
 
-              {/* Card Content */}
-              <div className="tool-catalogue-card__body">
-                <div className="tool-catalogue-card__category-tag">
-                  {tool.category}
-                </div>
-                <h3 className="tool-catalogue-card__name">{tool.name}</h3>
-                <p className="tool-catalogue-card__desc">{tool.description}</p>
-                <div className="tool-catalogue-card__footer">
-                  <div className="tool-catalogue-card__meta">
-                    <span className="tool-catalogue-card__rating">
-                      <Star size={13} />
-                      {tool.rating}
-                    </span>
-                    <span className="tool-catalogue-card__users">
-                      <Users size={13} />
-                      {tool.users}
-                    </span>
+                {/* Colored Icon Area */}
+                <a
+                  href={tool.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="tool-catalogue-card__icon-area"
+                  style={{ backgroundColor: tool.bgColor }}
+                >
+                  <span className="tool-catalogue-card__emoji">{tool.emoji}</span>
+                </a>
+
+                {/* Card Content */}
+                <div className="tool-catalogue-card__body">
+                  <div className="tool-catalogue-card__category-tag">
+                    {tool.category}
                   </div>
-                  <span className="tool-catalogue-card__link-icon">
-                    <ExternalLink size={14} />
-                  </span>
+                  <h3 className="tool-catalogue-card__name">{tool.name}</h3>
+                  <p className="tool-catalogue-card__desc">{tool.description}</p>
+                  <div className="tool-catalogue-card__footer">
+                    <div className="tool-catalogue-card__meta">
+                      <span className="tool-catalogue-card__rating">
+                        <Star size={13} />
+                        {tool.rating}
+                      </span>
+                      <span className="tool-catalogue-card__users">
+                        <Users size={13} />
+                        {tool.users}
+                      </span>
+                    </div>
+                    <a
+                      href={tool.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="tool-catalogue-card__link-icon"
+                    >
+                      <ExternalLink size={14} />
+                    </a>
+                  </div>
                 </div>
-              </div>
-            </motion.a>
-          ))}
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
 
+        {/* Empty State */}
         {filteredTools.length === 0 && (
           <div className="catalogue-empty">
-            <p>No tools found matching your criteria.</p>
-            <button
-              className="catalogue-empty__reset"
-              onClick={() => {
-                setSearchQuery("");
-                setActiveCategory("All");
-              }}
-            >
-              Clear filters
-            </button>
+            {activeView === "saved" ? (
+              <>
+                <div className="catalogue-empty__icon">
+                  <Bookmark size={32} />
+                </div>
+                <p>No saved tools yet.</p>
+                <p className="catalogue-empty__sub">
+                  Click the bookmark icon on any tool to save it here.
+                </p>
+                <button
+                  className="catalogue-empty__reset"
+                  onClick={() => setActiveView("all")}
+                >
+                  Browse All Tools
+                </button>
+              </>
+            ) : (
+              <>
+                <p>No tools found matching your criteria.</p>
+                <button
+                  className="catalogue-empty__reset"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setActiveCategory("All");
+                  }}
+                >
+                  Clear filters
+                </button>
+              </>
+            )}
           </div>
         )}
       </main>

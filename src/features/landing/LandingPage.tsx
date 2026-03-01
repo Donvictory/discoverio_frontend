@@ -1,17 +1,23 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles,
-  ArrowUpRight,
+  ArrowRight,
   Menu,
   X,
-  ChevronDown,
+  MessageSquare,
+  BarChart3,
+  Bookmark,
+  LayoutGrid,
+  Users,
+  Wrench,
+  FolderOpen,
+  Search,
 } from "lucide-react";
-import stickyNoteImg from "./assets/sticky-note.png";
-import remindersImg from "./assets/reminders.png";
-import tasksImg from "./assets/tasks.png";
-import integrationsImg from "./assets/integrations.png";
+import chatMockupImg from "./assets/chat-mockup.png";
+import catalogImg from "./assets/catalog-illustration.png";
+import techBannerImg from "./assets/tech-banner.png";
 import "./LandingPage.css";
 
 export function LandingPage() {
@@ -25,49 +31,28 @@ export function LandingPage() {
           <Link to="/" className="landing-nav__logo">
             <span className="logo-icon">
               <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                <rect width="11" height="11" rx="3" fill="#1a1d2e" />
-                <rect x="15" width="11" height="11" rx="3" fill="#1a1d2e" />
-                <rect y="15" width="11" height="11" rx="3" fill="#1a1d2e" />
-                <circle cx="20.5" cy="20.5" r="4" fill="#2ec4b6" />
+                <rect width="12" height="12" rx="3" fill="#4361EE" />
+                <rect x="14" width="12" height="12" rx="3" fill="#4361EE" opacity="0.6" />
+                <rect y="14" width="12" height="12" rx="3" fill="#4361EE" opacity="0.6" />
+                <rect x="14" y="14" width="12" height="12" rx="3" fill="#4361EE" opacity="0.3" />
               </svg>
             </span>
             <span className="logo-wordmark">Discover.io</span>
           </Link>
 
-          <nav className={`landing-nav__links ${menuOpen ? "open" : ""}`}>
-            <a href="#hero" onClick={() => setMenuOpen(false)}>
-              Home
-            </a>
-            <a href="#features" className="nav-dropdown-trigger" onClick={() => setMenuOpen(false)}>
-              Features <ChevronDown size={14} />
-            </a>
-            <a href="#how-it-works" onClick={() => setMenuOpen(false)}>
-              How It Works
-            </a>
-            <a href="#about" onClick={() => setMenuOpen(false)}>
-              About
-            </a>
-            {/* Mobile-only auth links */}
-            <div className="mobile-auth-links">
-              <Link to="/login" onClick={() => setMenuOpen(false)}>
-                Login
-              </Link>
-              <Link
-                to="/register"
-                className="mobile-signup-btn"
-                onClick={() => setMenuOpen(false)}
-              >
-                Sign Up
-              </Link>
-            </div>
+          {/* Desktop nav links */}
+          <nav className="landing-nav__links">
+            <a href="#hero">Find AI</a>
+            <a href="#how-it-works">How It Works</a>
+            <Link to="/catalogue">Catalog</Link>
           </nav>
 
           <div className="landing-nav__actions">
             <Link to="/login" className="nav-link-btn">
-              Login
+              Log in
             </Link>
             <Link to="/register" className="nav-cta-btn">
-              Sign Up
+              Get Started
             </Link>
           </div>
 
@@ -81,48 +66,88 @@ export function LandingPage() {
         </div>
       </header>
 
+      {/* ─── Mobile Menu Overlay ────────────────────────────── */}
+      <AnimatePresence>
+        {menuOpen && (
+          <>
+            <motion.div
+              className="landing-mobile-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setMenuOpen(false)}
+            />
+            <motion.div
+              className="landing-mobile-menu"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            >
+              <div className="landing-mobile-menu__header">
+                <span className="landing-mobile-menu__title">Menu</span>
+                <button
+                  className="landing-mobile-menu__close"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <nav className="landing-mobile-menu__nav">
+                <a
+                  href="#hero"
+                  className="landing-mobile-menu__link"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <Search size={18} />
+                  <span>Find AI</span>
+                </a>
+                <a
+                  href="#how-it-works"
+                  className="landing-mobile-menu__link"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <BarChart3 size={18} />
+                  <span>How It Works</span>
+                </a>
+                <Link
+                  to="/catalogue"
+                  className="landing-mobile-menu__link"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <LayoutGrid size={18} />
+                  <span>Catalog</span>
+                </Link>
+              </nav>
+
+              <div className="landing-mobile-menu__footer">
+                <Link
+                  to="/login"
+                  className="landing-mobile-menu__login"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Log in
+                </Link>
+                <Link
+                  to="/register"
+                  className="landing-mobile-menu__signup"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Get Started
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       {/* ─── Hero ──────────────────────────────────────────── */}
       <section className="hero" id="hero">
         <div className="hero__bg" aria-hidden="true" />
 
-        {/* Floating cards around the hero */}
-        <motion.div
-          className="hero__float-card hero__float-card--sticky"
-          initial={{ opacity: 0, x: -60, y: 20 }}
-          animate={{ opacity: 1, x: 0, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-        >
-          <img src={stickyNoteImg} alt="Sticky notes" />
-        </motion.div>
-
-        <motion.div
-          className="hero__float-card hero__float-card--reminders"
-          initial={{ opacity: 0, x: 60, y: -20 }}
-          animate={{ opacity: 1, x: 0, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-        >
-          <img src={remindersImg} alt="Reminders widget" />
-        </motion.div>
-
-        <motion.div
-          className="hero__float-card hero__float-card--tasks"
-          initial={{ opacity: 0, x: -40, y: 40 }}
-          animate={{ opacity: 1, x: 0, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.7 }}
-        >
-          <img src={tasksImg} alt="Today's tasks" />
-        </motion.div>
-
-        <motion.div
-          className="hero__float-card hero__float-card--integrations"
-          initial={{ opacity: 0, x: 40, y: 40 }}
-          animate={{ opacity: 1, x: 0, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.9 }}
-        >
-          <img src={integrationsImg} alt="100+ integrations" />
-        </motion.div>
-
-        {/* Center content */}
         <div className="hero__content">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -133,54 +158,58 @@ export function LandingPage() {
             {/* Badge */}
             <div className="hero__badge">
               <Sparkles size={14} />
-              <span>Discover AI Tools Smarter</span>
+              <span>AI-Powered Tool Discovery</span>
             </div>
 
             <h1>
-              Smarter AI Tool{" "}
-              <span className="hero__accent accent-italic">Discovery</span>,
+              Find the perfect{" "}
+              <span className="hero__accent">AI tool</span>
               <br />
-              Powered by{" "}
-              <span className="hero__accent-light">Real Context</span>
+              for your workflow
             </h1>
 
             <p className="hero__subtitle">
-              Describe your problem, and we'll recommend the perfect AI tools.
-              No more guesswork — get context-driven, ranked recommendations
-              tailored to your exact workflow.
+              Describe what you're working on. Discover.io listens to what you
+              need and recommends AI tools that are relevant, reliable and built
+              for your specific use case.
             </p>
 
             <div className="hero__cta-group">
               <Link to="/register" className="hero__cta-primary">
-                Start Free Trial <ArrowUpRight size={16} />
+                Get Started Free <ArrowRight size={16} />
               </Link>
-              <a href="#how-it-works" className="hero__cta-secondary">
-                Learn More <ArrowUpRight size={16} />
-              </a>
+              <Link to="/catalogue" className="hero__cta-secondary">
+                Explore Tools <ArrowRight size={16} />
+              </Link>
+            </div>
+
+            {/* Stats */}
+            <div className="hero__stats">
+              <div className="hero__stat">
+                <Users size={16} />
+                <span>
+                  <strong>2.5K+</strong> Users
+                </span>
+              </div>
+              <div className="hero__stat">
+                <Wrench size={16} />
+                <span>
+                  <strong>1,000+</strong> AI Tools
+                </span>
+              </div>
+              <div className="hero__stat">
+                <FolderOpen size={16} />
+                <span>
+                  <strong>50+</strong> Categories
+                </span>
+              </div>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* ─── Trust Badges ──────────────────────────────────── */}
-      <section className="trust-section">
-        <div className="section__inner">
-          <p className="trust-label">Trusted by 104+ Businesses</p>
-          <div className="trust-logos">
-            {["CoreOS", "Leapyear", "EasyTax", "Foresight", "Peregrin"].map(
-              (name) => (
-                <div key={name} className="trust-logo">
-                  <span className="trust-logo__icon">✦</span>
-                  <span className="trust-logo__name">{name}</span>
-                </div>
-              ),
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Features ──────────────────────────────────────── */}
-      <section className="features" id="features">
+      {/* ─── Why Discover.io? ────────────────────────────────── */}
+      <section className="why-section" id="features">
         <div className="section__inner">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -189,57 +218,38 @@ export function LandingPage() {
             transition={{ duration: 0.5 }}
             className="section__header"
           >
-            <div className="section__badge">
-              <span>One AI Tool Discovery Hub</span>
-            </div>
-            <h2>
-              Everything You Need to
-              <br />
-              <span className="accent-italic">Find the Right Tools</span>
-            </h2>
+            <h2>Why Discover.io?</h2>
             <p>
-              Our system understands your problems and recommends tools with
-              context, not just keywords. Built for creatives who need results.
+              Stop scrolling through generic AI tool directories. Get recommendations
+              that actually fit your workflow.
             </p>
           </motion.div>
 
-          <div className="features__grid">
+          <div className="why-grid">
             {[
               {
-                emoji: "💬",
-                title: "Natural Language Search",
+                icon: <MessageSquare size={24} />,
+                title: "Conversational Discovery",
                 description:
-                  "Just describe your problem in plain English. Our AI understands context, not just keywords.",
+                  "Describe your workflow in natural language. Our AI understands context, not just keywords.",
               },
               {
-                emoji: "🎯",
-                title: "Context-Driven Matching",
+                icon: <BarChart3 size={24} />,
+                title: "Personalized Rankings",
                 description:
-                  "We diagnose your exact use case — your role, task, and success criteria — before recommending.",
+                  "AI-driven recommendations ranked by relevance to your specific use case and workflow.",
               },
               {
-                emoji: "📊",
-                title: "Ranked Recommendations",
+                icon: <Bookmark size={24} />,
+                title: "Save & Revisit",
                 description:
-                  "Every tool is scored on usefulness, relevance, and reliability. No guesswork, just data.",
+                  "Bookmark your favorite tools and revisit your history and saved recommendations anytime.",
               },
               {
-                emoji: "🛡️",
-                title: "Verified & Curated",
+                icon: <LayoutGrid size={24} />,
+                title: "Curated Catalog",
                 description:
-                  "We only recommend tools from our verified database. No hallucinated products, ever.",
-              },
-              {
-                emoji: "⚡",
-                title: "Built for Creatives",
-                description:
-                  "Designers, developers, writers, marketers — we understand your specific workflows.",
-              },
-              {
-                emoji: "✨",
-                title: "Practical Guidance",
-                description:
-                  "Don't just get a list — get actionable advice on how to use each tool for your task.",
+                  "Browse 1,000+ verified AI tools organized by category, with ratings and reviews.",
               },
             ].map((feature, i) => (
               <motion.div
@@ -247,10 +257,10 @@ export function LandingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.08 }}
-                className="feature-card"
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                className="why-card"
               >
-                <div className="feature-card__icon">{feature.emoji}</div>
+                <div className="why-card__icon">{feature.icon}</div>
                 <h3>{feature.title}</h3>
                 <p>{feature.description}</p>
               </motion.div>
@@ -259,52 +269,59 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* ─── About / Stats Section ────────────────────────── */}
-      <section className="about-section" id="about">
-        <div className="section__inner about-inner">
+      {/* ─── See It in Action ────────────────────────────────── */}
+      <section className="action-section" id="action">
+        <div className="section__inner">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="about-text"
+            className="section__header"
           >
-            <div className="section__badge">
-              <span>About Us</span>
-            </div>
-            <h2>
-              Simplifying AI Tool{" "}
-              <span className="accent-italic">Discovery</span>
-            </h2>
+            <h2>See it in Action</h2>
             <p>
-              Discover.io helps creatives, developers, and professionals find AI
-              tools with clarity and confidence. We go beyond generic search
-              results to give you context-driven, personalized recommendations.
+              A preview of what our conversational discovery can do for
+              you — it's that easy.
             </p>
-            <Link to="/register" className="about-cta">
-              Explore More →
-            </Link>
           </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.15 }}
-            className="about-stats"
-          >
-            <div className="stat-item">
-              <span className="stat-number">100K+</span>
-              <span className="stat-label">Active Users</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-number">2M+</span>
-              <span className="stat-label">Tools Analyzed</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-number">4.9</span>
-              <span className="stat-label">Average Rating</span>
-            </div>
-          </motion.div>
+
+          <div className="action-grid">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="action-card"
+            >
+              <h3>Chat with AI</h3>
+              <p>
+                Describe your workflow, ask questions, and get personalized
+                suggestions. Our AI understands context and provides recommendations
+                tailored to your needs.
+              </p>
+              <div className="action-card__image">
+                <img src={chatMockupImg} alt="Chat with AI mockup" />
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.15 }}
+              className="action-card"
+            >
+              <h3>Browse the Catalog</h3>
+              <p>
+                Explore our curated collection of AI tools filtered by category. Read
+                reviews and find the best tools for your workflow.
+              </p>
+              <div className="action-card__image">
+                <img src={catalogImg} alt="Browse the catalog" />
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -326,21 +343,21 @@ export function LandingPage() {
             {[
               {
                 step: "01",
-                title: "Describe Your Need",
+                title: "Tell us about you",
                 description:
-                  'Tell us what you\'re trying to accomplish in your own words. For example: "I need an AI to clean up podcast audio."',
+                  "Share your role, expertise, and preferences during a simple onboarding flow.",
               },
               {
                 step: "02",
-                title: "We Diagnose & Confirm",
+                title: "Describe your need",
                 description:
-                  "Our AI extracts your persona, core task, and success criteria — then confirms with you before searching.",
+                  "Describe what you're working on — our AI understands context, not just keywords.",
               },
               {
                 step: "03",
-                title: "Get Curated Results",
+                title: "Get recommendations",
                 description:
-                  "Receive a ranked list of tools with explanations, trade-offs, and practical guidance for your specific case.",
+                  "Receive ranked, curated tools with explanations, trade-offs, and practical guidance.",
               },
             ].map((item, i) => (
               <motion.div
@@ -360,6 +377,21 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* ─── Tech Banner ─────────────────────────────────────── */}
+      <section className="tech-banner-section">
+        <div className="section__inner">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="tech-banner"
+          >
+            <img src={techBannerImg} alt="AI Tools Connected" />
+          </motion.div>
+        </div>
+      </section>
+
       {/* ─── CTA ───────────────────────────────────────────── */}
       <section className="cta-section">
         <div className="section__inner">
@@ -370,13 +402,12 @@ export function LandingPage() {
             transition={{ duration: 0.5 }}
             className="cta-box"
           >
-            <h2>Ready to find the right tool?</h2>
+            <h2>Ready to discover your AI toolkit?</h2>
             <p>
-              Join Discover.io and stop wasting time on tools that don't fit
-              your workflow.
+              Join thousands of creative professionals who find the tools they need, fast.
             </p>
-            <Link to="/register" className="hero__cta-primary">
-              Get Started — It's Free →
+            <Link to="/register" className="cta-box__btn">
+              Get Started for Free <ArrowRight size={16} />
             </Link>
           </motion.div>
         </div>
@@ -386,45 +417,21 @@ export function LandingPage() {
       <footer className="landing-footer">
         <div className="landing-footer__inner">
           <div className="landing-footer__brand">
-            <div className="landing-nav__logo">
+            <Link to="/" className="landing-nav__logo">
               <span className="logo-icon">
-                <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
-                  <rect width="11" height="11" rx="3" fill="#1a1d2e" />
-                  <rect x="15" width="11" height="11" rx="3" fill="#1a1d2e" />
-                  <rect y="15" width="11" height="11" rx="3" fill="#1a1d2e" />
-                  <circle cx="20.5" cy="20.5" r="4" fill="#2ec4b6" />
+                <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+                  <rect width="12" height="12" rx="3" fill="#4361EE" />
+                  <rect x="14" width="12" height="12" rx="3" fill="#4361EE" opacity="0.6" />
+                  <rect y="14" width="12" height="12" rx="3" fill="#4361EE" opacity="0.6" />
+                  <rect x="14" y="14" width="12" height="12" rx="3" fill="#4361EE" opacity="0.3" />
                 </svg>
               </span>
               <span className="logo-wordmark">Discover.io</span>
-            </div>
-            <p>
-              AI-powered discovery for creatives. Find the right tool, every
-              time.
-            </p>
+            </Link>
           </div>
-
-          <div className="landing-footer__links">
-            <div className="footer-col">
-              <h4>Product</h4>
-              <a href="#features">Features</a>
-              <a href="#how-it-works">How It Works</a>
-              <Link to="/chat">Try Chat</Link>
-            </div>
-            <div className="footer-col">
-              <h4>Account</h4>
-              <Link to="/login">Login</Link>
-              <Link to="/register">Sign Up</Link>
-              <Link to="/onboarding">Onboarding</Link>
-            </div>
-            <div className="footer-col">
-              <h4>Company</h4>
-              <a href="#about">About</a>
-              <a href="#about">Contact</a>
-            </div>
-          </div>
-        </div>
-        <div className="landing-footer__bottom">
-          <p>&copy; 2026 Discover.io. All rights reserved.</p>
+          <p className="landing-footer__copy">
+            &copy; 2026 Discover.io. All rights reserved.
+          </p>
         </div>
       </footer>
     </div>
