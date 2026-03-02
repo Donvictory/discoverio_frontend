@@ -3,7 +3,9 @@ import { LandingPage } from "./features/landing/LandingPage";
 import { LoginPage } from "./features/auth/LoginPage";
 import { RegisterPage } from "./features/auth/RegisterPage";
 import { OnboardingFlow } from "./features/onboarding/OnboardingFlow";
-import { ChatLayout } from "./features/chat/ChatLayout";
+import { ChatbotPage } from "./features/chatbot/ChatbotPage";
+import { ToolsCatalogue } from "./features/catalogue/ToolsCatalogue";
+import { ProfilePage } from "./features/profile/ProfilePage";
 import "./App.css";
 
 function App() {
@@ -22,7 +24,9 @@ function App() {
           />
         }
       />
-      <Route path="/chat" element={<ChatLayout />} />
+      <Route path="/chat" element={<ChatbotPage />} />
+      <Route path="/catalogue" element={<ToolsCatalogue />} />
+      <Route path="/profile" element={<ProfilePage />} />
       {/* Catch-all: redirect unknown routes to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

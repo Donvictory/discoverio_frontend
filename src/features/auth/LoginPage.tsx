@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { Logo } from "../../components/common/Logo";
 import "./AuthPages.css";
 
 export function LoginPage() {
@@ -20,7 +21,6 @@ export function LoginPage() {
     }
 
     setLoading(true);
-    // Simulate brief loading then navigate
     setTimeout(() => {
       setLoading(false);
       navigate("/chat", { replace: true });
@@ -29,16 +29,13 @@ export function LoginPage() {
 
   return (
     <div className="auth-page">
-      <div className="auth-bg" aria-hidden="true" />
+      {/* Logo */}
+      <Logo className="auth-logo" size={24} />
 
+      {/* Card */}
       <div className="auth-card">
-        <Link to="/" className="auth-logo">
-          <span className="auth-logo__icon">✦</span>
-          <span className="auth-logo__text">Discover.io</span>
-        </Link>
-
         <h1 className="auth-heading">Welcome back</h1>
-        <p className="auth-subheading">Sign in to continue to your account</p>
+        <p className="auth-subheading">Sign in to continue your discovery.</p>
 
         {error && (
           <div className="auth-error" role="alert">
@@ -79,24 +76,16 @@ export function LoginPage() {
             disabled={loading}
             id="login-submit-btn"
           >
-            {loading ? <span className="auth-btn__spinner" /> : "Sign in"}
+            {loading ? <span className="auth-btn__spinner" /> : "Sign In"}
           </button>
         </form>
-
-        <Link to="/chat" className="auth-guest-link">
-          Continue as Guest →
-        </Link>
 
         <p className="auth-footer-text">
           Don&apos;t have an account?{" "}
           <Link to="/register" className="auth-link">
-            Create one
+            Sign up
           </Link>
         </p>
-
-        <Link to="/" className="auth-back-link">
-          ← Back to home
-        </Link>
       </div>
     </div>
   );
