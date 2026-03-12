@@ -159,13 +159,13 @@ export const Navbar: React.FC = () => {
                 </Link>
 
                 {/* History Section - Only show if on chat page or if we want global history */}
-                {chatSessionsRes?.data && chatSessionsRes.data.length > 0 && (
+                {chatSessionsRes && chatSessionsRes.length > 0 && (
                   <div className="chat-mobile-history">
                     <div className="chat-mobile-history__header">
                       <span>Recent Chats</span>
                     </div>
                     <div className="chat-mobile-history__list">
-                      {chatSessionsRes.data.slice(0, 5).map((session) => (
+                      {chatSessionsRes.slice(0, 5).map((session: any) => (
                         <Link
                           key={session.id}
                           to={`/chat?session=${session.id}`}

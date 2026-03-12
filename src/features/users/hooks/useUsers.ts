@@ -57,7 +57,7 @@ export function useUpdateUser() {
       id: string;
       payload: Parameters<typeof updateUser>[1];
     }) => updateUser(id, payload),
-    onSuccess: (_, { id }) => {
+    onSuccess: (_: any, { id }: { id: string; payload: any }) => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
       queryClient.invalidateQueries({ queryKey: ["users", id] });
     },

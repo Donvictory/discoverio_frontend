@@ -28,9 +28,9 @@ const getCancelSource = (): CancelTokenSource => axios.CancelToken.source();
 // ─── withAbort ────────────────────────────────────────────────────────────────
 // Extracts `abort` from the config, wires a CancelToken, then calls the real fn.
 
-const withAbort = <T>(fn: (...args: any[]) => Promise<T>) => {
+const withAbort = <T>(fn: (...args: any[]) => any) => {
   return async (...args: any[]): Promise<T> => {
-    const originalConfig = args[args.length - 1] as ExtendedConfig;
+    const originalConfig = (args[args.length - 1] || {}) as ExtendedConfig;
     const { abort, ...config } = originalConfig;
 
     if (typeof abort === "function") {
@@ -40,17 +40,11 @@ const withAbort = <T>(fn: (...args: any[]) => Promise<T>) => {
     }
 
     try {
-      // POST/PUT/PATCH have a body as the second arg
-      if (args.length > 2) {
-        const [url, body] = args as [string, any];
-        return await fn(url, body, config);
-      } else {
-        const [url] = args as [string];
-        return await fn(url, config);
-      }
+      const result = await fn(...args.slice(0, -1), config);
+      return result.data !== undefined ? result : result; // Keep axios response
     } catch (error) {
       if (didAbort(error)) {
-        (error as Record<string, unknown>).aborted = true;
+        (error as any).aborted = true;
       }
       throw error;
     }
@@ -219,41 +213,31 @@ axiosInstance.interceptors.response.use(
 
 const api = {
   get: <T = unknown>(url: string, config: ExtendedConfig = {}) =>
-    withLogger(withAbort(axiosInstance.get<T>)(url, config)) as Promise<
-      import("axios").AxiosResponse<T>
-    >,
+    withLogger(withAbort<import("axios").AxiosResponse<T>>(axiosInstance.get)(url, config)),
 
   delete: <T = unknown>(url: string, config: ExtendedConfig = {}) =>
-    withLogger(withAbort(axiosInstance.delete<T>)(url, config)) as Promise<
-      import("axios").AxiosResponse<T>
-    >,
+    withLogger(withAbort<import("axios").AxiosResponse<T>>(axiosInstance.delete)(url, config)),
 
   post: <T = unknown>(
     url: string,
     body: unknown = {},
     config: ExtendedConfig = {},
   ) =>
-    withLogger(withAbort(axiosInstance.post<T>)(url, body, config)) as Promise<
-      import("axios").AxiosResponse<T>
-    >,
+    withLogger(withAbort<import("axios").AxiosResponse<T>>(axiosInstance.post)(url, body, config)),
 
   patch: <T = unknown>(
     url: string,
     body: unknown = {},
     config: ExtendedConfig = {},
   ) =>
-    withLogger(withAbort(axiosInstance.patch<T>)(url, body, config)) as Promise<
-      import("axios").AxiosResponse<T>
-    >,
+    withLogger(withAbort<import("axios").AxiosResponse<T>>(axiosInstance.patch)(url, body, config)),
 
   put: <T = unknown>(
     url: string,
     body: unknown = {},
     config: ExtendedConfig = {},
   ) =>
-    withLogger(withAbort(axiosInstance.put<T>)(url, body, config)) as Promise<
-      import("axios").AxiosResponse<T>
-    >,
+    withLogger(withAbort<import("axios").AxiosResponse<T>>(axiosInstance.put)(url, body, config)),
 };
 
 export default api;
