@@ -32,9 +32,9 @@ export function ToolDetail() {
   const normalizedToolId = tool?.id || (tool as any)?._id || id;
   const isSaved = bookmarks.some(
     (b: any) =>
-      b.tool_id === normalizedToolId ||
-      b.id === normalizedToolId ||
-      b._id === normalizedToolId,
+      (b.tool_id === normalizedToolId && !!normalizedToolId) ||
+      (b.tool_name?.toLowerCase() === tool?.name?.toLowerCase() &&
+        !!tool?.name),
   );
 
   const toggleSaved = () => {
@@ -42,9 +42,9 @@ export function ToolDetail() {
 
     const existingBookmark = bookmarks.find(
       (b: any) =>
-        b.tool_id === normalizedToolId ||
-        b.id === normalizedToolId ||
-        b._id === normalizedToolId,
+        (b.tool_id === normalizedToolId && !!normalizedToolId) ||
+        (b.tool_name?.toLowerCase() === tool.name?.toLowerCase() &&
+          !!tool.name),
     );
 
     if (existingBookmark) {

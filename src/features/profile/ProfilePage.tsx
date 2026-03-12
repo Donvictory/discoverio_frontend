@@ -19,6 +19,10 @@ import {
 import { Logo } from "../../components/common/Logo";
 import { useAuth } from "../../context/AuthContext";
 import { useLogout } from "../auth/hooks/useLogout";
+import { useBookmarks } from "../bookmarks/hooks/useBookmarks";
+import { useChatSessions } from "../chatbot/hooks/useChatbot";
+import { LoadingSpinner } from "../../components/ui";
+import { formatDistanceToNow } from "date-fns";
 import "./ProfilePage.css";
 
 export function ProfilePage() {
@@ -26,6 +30,9 @@ export function ProfilePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user } = useAuth();
   const { handleLogout: handleSignOut } = useLogout();
+
+  const { data: bookmarksData, isLoading: bookmarksLoading } = useBookmarks();
+  const { data: chatSessionsData, isLoading: chatsLoading } = useChatSessions();
 
   const getJobTitleDisplay = () => {
     if (!user?.professionalProfile) return "Professional";
@@ -224,15 +231,27 @@ export function ProfilePage() {
         {/* Stats Grid */}
         <section className="profile-stats">
           <div className="profile-stat-card">
-            <span className="profile-stat-value">12</span>
+            <span className="profile-stat-value">
+              {bookmarksLoading ? "..." : (bookmarksData as any)?.data?.length || 0}
+            </span>
             <span className="profile-stat-label">Tools Saved</span>
           </div>
           <div className="profile-stat-card">
-            <span className="profile-stat-value">28</span>
+            <span className="profile-stat-value">
+              {chatsLoading ? "..." : (chatSessionsData as any)?.data?.length || 0}
+            </span>
             <span className="profile-stat-label">Searches</span>
           </div>
           <div className="profile-stat-card">
-            <span className="profile-stat-value">5</span>
+            <span className="profile-stat-value">
+              {bookmarksLoading
+                ? "..."
+                : new Set(
+                    (bookmarksData as any)?.data
+                      ?.filter((b: any) => b.category)
+                      .map((b: any) => b.category),
+                  ).size || 0}
+            </span>
             <span className="profile-stat-label">Categories</span>
           </div>
         </section>
@@ -240,35 +259,41 @@ export function ProfilePage() {
         {/* Recent Searches */}
         <section className="profile-section">
           <h2>Recent Searches</h2>
-          <div className="profile-searches-list">
-            <div className="profile-search-item">
-              <span className="profile-search-text">
-                Best AI tools for writing blog posts
-              </span>
-              <div className="profile-search-time">
-                <Clock size={14} />
-                <span>2 hours ago</span>
-              </div>
+          {chatsLoading ? (
+            <LoadingSpinner message="Loading searches..." />
+          ) : (chatSessionsData as any)?.data?.length > 0 ? (
+            <div className="profile-searches-list">
+              {(chatSessionsData as any).data.slice(0, 5).map((chat: any) => (
+                <div
+                  key={chat._id || chat.id}
+                  className="profile-search-item"
+                  onClick={() => navigate(`/chat?id=${chat._id || chat.id}`)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <span className="profile-search-text">
+                    {chat.title || "Untitled Conversation"}
+                  </span>
+                  <div className="profile-search-time">
+                    <Clock size={14} />
+                    <span>
+                      {chat.updatedAt
+                        ? formatDistanceToNow(new Date(chat.updatedAt), {
+                            addSuffix: true,
+                          })
+                        : "Recently"}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="profile-search-item">
-              <span className="profile-search-text">
-                Video editing AI tools
-              </span>
-              <div className="profile-search-time">
-                <Clock size={14} />
-                <span>Yesterday</span>
-              </div>
+          ) : (
+            <div className="profile-empty-state">
+              <p>No search history yet.</p>
+              <Link to="/chat" className="profile-empty-link">
+                Start your first search
+              </Link>
             </div>
-            <div className="profile-search-item">
-              <span className="profile-search-text">
-                Design tools for social media
-              </span>
-              <div className="profile-search-time">
-                <Clock size={14} />
-                <span>3 days ago</span>
-              </div>
-            </div>
-          </div>
+          )}
         </section>
       </main>
     </div>
