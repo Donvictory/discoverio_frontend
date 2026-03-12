@@ -73,19 +73,31 @@ export function ChatbotPage() {
   const { mutate: createBookmarkMutation } = useCreateBookmark();
   const { mutate: deleteBookmarkMutation } = useDeleteBookmark();
 
-  const isBookmarked = (name: string) =>
-    bookmarksData?.data?.some((b) => b.tool_name === name) || false;
+  const bookmarks = Array.isArray(bookmarksData)
+    ? bookmarksData
+    : (bookmarksData as any)?.data || [];
+
+  const isBookmarked = (name: string, toolId?: string) =>
+    bookmarks.some(
+      (b: any) =>
+        (b.tool_name?.toLowerCase() === name?.toLowerCase() && !!name) ||
+        (b.tool_id === toolId && !!toolId),
+    ) || false;
 
   const toggleBookmark = (tool: any) => {
-    const existing = bookmarksData?.data?.find(
-      (b) => b.tool_name === tool.name,
+    const existing = bookmarks.find(
+      (b: any) =>
+        (b.tool_name?.toLowerCase() === tool.name?.toLowerCase() &&
+          !!tool.name) ||
+        (b.tool_id === tool.id && !!tool.id),
     );
 
     if (existing) {
       deleteBookmarkMutation(existing.id);
     } else {
       // Check if tool.id is a real MongoDB ID or just an index
-      const isRealId = tool.id && tool.id.length > 10;
+      const isRealId =
+        tool.id && typeof tool.id === "string" && tool.id.length > 10;
 
       if (isRealId) {
         createBookmarkMutation(tool.id);
@@ -94,7 +106,7 @@ export function ChatbotPage() {
           tool_name: tool.name,
           tool_description: tool.description,
           tool_url: tool.url || "#",
-          tool_id: isRealId ? tool.id : undefined,
+          tool_id: undefined,
         });
       }
     }
@@ -457,7 +469,7 @@ export function ChatbotPage() {
                                     <div className="chat-tool-card__actions">
                                       <button
                                         className={`chat-tool-card__bookmark ${
-                                          isBookmarked(tool.name)
+                                          isBookmarked(tool.name, tool.id)
                                             ? "active"
                                             : ""
                                         }`}
@@ -466,7 +478,7 @@ export function ChatbotPage() {
                                         <Bookmark
                                           size={16}
                                           fill={
-                                            isBookmarked(tool.name)
+                                            isBookmarked(tool.name, tool.id)
                                               ? "currentColor"
                                               : "none"
                                           }

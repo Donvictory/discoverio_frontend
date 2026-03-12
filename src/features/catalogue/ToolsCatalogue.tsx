@@ -161,8 +161,12 @@ export default function ToolsCatalogue() {
     return [];
   }, [activeView, apiTools, bookmarks, personalizedData]);
 
-  const isSaved = (toolId: string) => {
-    return bookmarks.some((b: any) => (b.tool_id || b.id || b._id) === toolId);
+  const isSaved = (toolId: string, toolName?: string) => {
+    return bookmarks.some(
+      (b: any) =>
+        (b.tool_id === toolId && !!toolId) ||
+        (b.tool_name?.toLowerCase() === toolName?.toLowerCase() && !!toolName),
+    );
   };
 
   const handleViewAll = (category: string) => {
@@ -281,11 +285,17 @@ export default function ToolsCatalogue() {
     e.stopPropagation();
 
     const toolId = tool.id || (tool as any)._id;
+    const existing = bookmarks.find(
+      (b: any) =>
+        (b.tool_id === toolId && !!toolId) ||
+        (b.tool_name?.toLowerCase() === tool.name?.toLowerCase() &&
+          !!tool.name),
+    );
 
-    if (isSaved(toolId)) {
-      deleteBookmark(toolId);
+    if (existing) {
+      deleteBookmark(existing.id);
     } else {
-      if (toolId) {
+      if (toolId && toolId.length > 10) {
         createBookmark(toolId); // Pass string ID for standard catalog tools
       } else {
         createBookmark({
@@ -602,7 +612,7 @@ export default function ToolsCatalogue() {
                             layout
                           >
                             <button
-                              className={`tool-catalogue-card__bookmark ${isSaved(tool.id) ? "saved" : ""}`}
+                              className={`tool-catalogue-card__bookmark ${isSaved(tool.id, tool.name) ? "saved" : ""}`}
                               onClick={(e) => toggleSaved(e, tool)}
                             >
                               <Bookmark size={16} />
@@ -680,7 +690,7 @@ export default function ToolsCatalogue() {
                     layout
                   >
                     <button
-                      className={`tool-catalogue-card__bookmark ${isSaved(tool.id) ? "saved" : ""}`}
+                      className={`tool-catalogue-card__bookmark ${isSaved(tool.id, tool.name) ? "saved" : ""}`}
                       onClick={(e) => toggleSaved(e, tool)}
                     >
                       <Bookmark size={16} />
