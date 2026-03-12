@@ -1,10 +1,10 @@
 # .gitignore
 
 # Asset/design directories (not needed in repo)
-temp-vite/
-UI/
-Design System (Community)/
-discover_io_ui_inspiration/
+/temp-vite/
+/UI/
+/Design System (Community)/
+/discover_io_ui_inspiration/
 
 # Logs
 logs
